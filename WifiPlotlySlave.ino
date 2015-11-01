@@ -12,7 +12,7 @@
 #define DEBUG_TO_SERIAL 0
 #define ASCII_START_TEXT 2
 #define ASCII_END_TEXT 3
-#define ROB_WS_MAX_STRING_DATA_LENGTH 100
+#define ROB_WS_MAX_STRING_DATA_LENGTH 164
 int newlineCount = 0;
 boolean printWebResponse = false;
 int serialBufferLength = 0;
