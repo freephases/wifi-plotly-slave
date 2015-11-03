@@ -43,7 +43,7 @@ Client *client;
 //plotly graph = plotly("username", "password", tokens, "your_filename", nTraces, client);
 plotly *graph;
 // *****************************
-SoftwareSerial masterMaga(6, 7);
+SoftwareSerial master(6, 7);
 
 /**
  * Process data sent vy master
@@ -51,11 +51,11 @@ SoftwareSerial masterMaga(6, 7);
 void processMasterSerial()
 {
   // send data only when you receive data:
-  while (masterMaga.available() > 0)
+  while (master.available() > 0)
   {
 
     // read the incoming byte:
-    inByte = masterMaga.read();
+    inByte = master.read();
 
     if (inByte == '\r') continue;
 
@@ -101,14 +101,14 @@ void beginWiFiSession() {
       if (DEBUG_TO_SERIAL == 1) {
         Serial.println("Association failed, check SSID and password are correct");
       }
-      masterMaga.println("E|No connection");
+      master.println("E|No connection");
     }
     else {
       haveConnectedToWifi = true;
-      masterMaga.println("OK|");
+      master.println("OK|");
     }
   } else {
-    masterMaga.println("OK|Already conencted");
+    master.println("OK|Already conencted");
   }
 }
 
@@ -116,7 +116,7 @@ boolean startedPlotting = false;
 
 void processStartPloting() {
   if (startedPlotting) {
-    masterMaga.println("E|Started plotting already!"); 
+    master.println("E|Started plotting already!"); 
     if (DEBUG_TO_SERIAL == 1) {
       Serial.println("E|Started plotting already!"); 
     }
@@ -153,7 +153,7 @@ void processStartPloting() {
   graph->maxpoints = maxpoints;
   bool success = graph->init();
   if (!success) {
-    masterMaga.print("E|PLOTY ERROR");
+    master.print("E|PLOTY ERROR");
     while (!success) {      
       delay(1000);
       success = graph->init();
@@ -163,7 +163,7 @@ void processStartPloting() {
   graph->openStream();
   startedPlotting = true;
  
-  masterMaga.println("OK|");
+  master.println("OK|");
   delay(500); 
   if (DEBUG_TO_SERIAL == 1) {
     Serial.println("OK sent to mega");
@@ -176,7 +176,7 @@ void processStartPloting() {
 
 void processPlot() {
   if (!startedPlotting) {
-    masterMaga.println("E|Cannot plot");
+    master.println("E|Cannot plot");
     if (DEBUG_TO_SERIAL == 1) {
       Serial.println("E|Cannot plot"); 
     }
@@ -194,11 +194,11 @@ void processPlot() {
    fVal = getValue(serialBuffer, '|', 3).toFloat()+0.0000; //+0.0000 fixes bug with float string conversions later on
     graph->plot(millis(),  fVal, token);
   }
-  masterMaga.println("OK|");
+  master.println("OK|");
   if (DEBUG_TO_SERIAL == 1) {
     Serial.println("OK sent to mega");
   }
-  //masterMaga.println("OK|");
+  //master.println("OK|");
 }
 
 void processMastersRequest() {
@@ -220,7 +220,7 @@ void processMastersRequest() {
       break;
 
     case '*' : // connected ok, send back ok
-      masterMaga.print("*\n");
+      master.print("*\n");
       delay(100);
       break;
   }
@@ -230,7 +230,7 @@ void processMastersRequest() {
 void setup() {
 
   Serial.begin(9600);
-  masterMaga.begin(9600);
+  master.begin(9600);
 
   WiFly.begin();
 
@@ -240,15 +240,15 @@ void setup() {
      if (DEBUG_TO_SERIAL==1) {
        Serial.println("Association failed.");
      }
-     //masterMaga.println("E|WIFI ERROR");
+     //master.println("E|WIFI ERROR");
     // delay(100);
    }*/
 
-  //  masterMaga.print("*\n");
+  //  master.print("*\n");
   //   delay(500);
-  //  masterMaga.print("***\n");
+  //  master.print("***\n");
   //  delay(300);
-  /// masterMaga.print("****\n"); //should know we are here by now we hope, depands if it was lookign i guess DOH! ;)
+  /// master.print("****\n"); //should know we are here by now we hope, depands if it was lookign i guess DOH! ;)
 
 
 }
