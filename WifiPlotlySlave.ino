@@ -1,7 +1,9 @@
 /**
 * Wifi Slave -
 *
-* Watch for memory usage as wifi card and maths lbs take up a lot at run time
+* Watch for memory usage as wifi card libs take up a lot at run time
+*
+* Version 0.0.1.1
 */
 #include <SoftwareSerial.h>
 
@@ -11,7 +13,6 @@
 /**
  */
 #include "WiFly.h"
-#include <math.h>
 // dump debug to serial 9600 O
 #define DEBUG_TO_SERIAL 0
 #define ROB_WS_MAX_STRING_DATA_LENGTH 120
@@ -29,8 +30,8 @@ boolean haveConnectedToWifi = false;
 
 // Sign up to plotly here: https://plot.ly
 // View your API key and streamtokens here: https://plot.ly/settings
-// note max nTraces is 5 due to memeory at run time
-#define nTraces 5
+// note max nTraces is 6 due to memeory at run time
+#define nTraces 6
 //up to x Traces only
 // View your tokens here: https://plot.ly/settings
 // Supply as many tokens as data traces
@@ -81,21 +82,21 @@ void processMasterSerial()
   }
 }
 
-char wifiSSID[30];
+char wifiSSID[20];
 char wifiPassword[20];
     
 void beginWiFiSession() {
   if (!haveConnectedToWifi) {
-
    
 
-    getValue(serialBuffer, '|', 1).toCharArray(wifiSSID, 30);
+    getValue(serialBuffer, '|', 1).toCharArray(wifiSSID, 20);
     getValue(serialBuffer, '|', 2).toCharArray(wifiPassword, 20);
 
     if (DEBUG_TO_SERIAL == 1) {
       Serial.println(wifiSSID);
       Serial.println(wifiPassword);
     }
+        
     if (!WiFly.join(wifiSSID, wifiPassword)) {
       // Hang on failure.
       if (DEBUG_TO_SERIAL == 1) {
@@ -156,6 +157,7 @@ void processStartPloting() {
     master.print("E|PLOTY ERROR");
     while (!success) {      
       delay(1000);
+      
       success = graph->init();
       
     }
@@ -215,42 +217,27 @@ void processMastersRequest() {
       }
       break;
 
-    case 'B' : // begin WiFi session
+    case 'B' : // begin WiFi session  SSID|PASSWORD
       beginWiFiSession();
       break;
 
-    case '*' : // connected ok, send back ok
-      master.print("*\n");
-      delay(100);
+    case '*' : // connected ok, send back two
+      master.print("**\n");
       break;
   }
 }
 
 
-void setup() {
 
+void setup() {
   Serial.begin(9600);
   master.begin(9600);
-
   WiFly.begin();
-
-
-  /*while (!WiFly.join(ssid, passphrase)) {
-     // Hang on failure.
-     if (DEBUG_TO_SERIAL==1) {
-       Serial.println("Association failed.");
-     }
-     //master.println("E|WIFI ERROR");
-    // delay(100);
-   }*/
-
-  //  master.print("*\n");
-  //   delay(500);
-  //  master.print("***\n");
-  //  delay(300);
-  /// master.print("****\n"); //should know we are here by now we hope, depands if it was lookign i guess DOH! ;)
-
-
+  master.flush();
+  //tell master we are here in case we start after master
+  master.print("*\n");
+  delay(500);
+  master.print("***\n");
 }
 
 void loop() {
