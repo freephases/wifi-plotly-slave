@@ -3,7 +3,7 @@
 *
 * Watch for memory usage as wifi card libs take up a lot at run time
 *
-* Version 0.0.1.1
+* Version 0.0.1.2
 */
 #include <SoftwareSerial.h>
 
@@ -31,7 +31,7 @@ boolean haveConnectedToWifi = false;
 // Sign up to plotly here: https://plot.ly
 // View your API key and streamtokens here: https://plot.ly/settings
 // note max nTraces is 6 due to memeory at run time
-#define nTraces 6
+#define nTraces 5
 //up to x Traces only
 // View your tokens here: https://plot.ly/settings
 // Supply as many tokens as data traces
@@ -39,7 +39,7 @@ boolean haveConnectedToWifi = false;
 //char *tokens[nTraces] = {"dfghrjsy27","d7ehjduegs"};
 // arguments: username, api key, streaming token, filename
 // HTTP client
-Client *client;
+Client *client = NULL;
 
 //plotly graph = plotly("username", "password", tokens, "your_filename", nTraces, client);
 plotly *graph;
@@ -162,13 +162,15 @@ void processStartPloting() {
       
     }
   }
-  graph->openStream();
-  startedPlotting = true;
- 
-  master.println("OK|");
-  delay(500); 
-  if (DEBUG_TO_SERIAL == 1) {
-    Serial.println("OK sent to mega");
+  else { 
+    graph->openStream();
+    startedPlotting = true;
+   
+    master.println("OK|");
+    //delay(500); 
+    if (DEBUG_TO_SERIAL == 1) {
+      Serial.println("OK sent to mega");
+    }
   }
 }
 
@@ -231,6 +233,7 @@ void processMastersRequest() {
 
 void setup() {
   Serial.begin(9600);
+  Serial.print("Wifi plotly slave started");
   master.begin(9600);
   WiFly.begin();
   master.flush();
